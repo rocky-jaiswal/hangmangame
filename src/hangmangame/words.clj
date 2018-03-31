@@ -13,3 +13,7 @@
   (->> raw-words
     (map cleanup)
     (filter #(< 4 (.length %1)))))
+
+(defn sample-word []
+  (first
+    (shuffle (build-words))))

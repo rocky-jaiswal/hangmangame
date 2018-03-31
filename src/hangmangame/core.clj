@@ -4,8 +4,21 @@
   (:require [hangmangame.ui :as ui])
   (:gen-class))
 
-(def game-state
-  (atom {:word "", :fails 0, :user-input []}))
+;; Game state management utils -----------------------------
+
+(def max-fails 7)
+
+(def default-state {:word "", :fails 0, :user-input []})
+
+(def game-state (atom default-state))
+
+(defn print-info-message []
+  (println
+    (str
+      "You have chosen poorly, all inputs - "
+      (:user-input @game-state)
+      " . Total fails: "
+      (inc (:fails @game-state)))))
 
 (defn set-word [word]
   (swap!
@@ -13,7 +26,7 @@
     assoc :word word))
 
 (defn add-fail []
-  (println (str "You have chosen poorly, total fails: " (inc (:fails @game-state))))
+  (print-info-message)
   (swap!
     game-state
     (fn [state]
@@ -26,32 +39,44 @@
       (assoc state :user-input
         (conj (:user-input state) input)))))
 
-(defn start-game []
-  (set-word
-    (first
-      (shuffle (words/build-words)))))
+;; Game state management utils -----------------------------
 
-(defn game-status [word inputs]
+(defn word-status [word inputs]
   (clojure.string/join
     (map (fn [letter]
             (if (= -1 (.indexOf inputs letter)) "_" letter))
       (str/split word #""))))
 
-(defn check-input [user-input]
-  (add-to-input user-input)
-  (when (= -1 (.indexOf (:word @game-state) user-input))
-    (add-fail)))
+(defn check-bad-input [word input]
+  (= -1 (.indexOf word input)))
+
+(defn word-guessed? []
+  (and
+    (not (empty? (:user-input @game-state)))
+    (= -1
+      (.indexOf (word-status (:word @game-state) (:user-input @game-state)) "_"))))
+
+(defn is-complete? []
+  (or
+    (word-guessed?)
+    (>= (:fails @game-state) max-fails)))
+
+;; Main game state manager ----------------------------------
 
 (defn run-game []
-  (println (str "Let's go!"))
-  (while (< (:fails @game-state) 7)
+  (reset! game-state default-state)
+  (println "Let's go!")
+  (set-word (words/sample-word))
+  (while (not (is-complete?))
     (do
-      (check-input (ui/read-user-input))
+      (add-to-input (ui/read-user-input))
+      (when (check-bad-input (:word @game-state) (last (:user-input @game-state)))
+        (add-fail))
       (println
-        (game-status (:word @game-state) (:user-input @game-state)))))
-  (println "Sorry, you failed ..."))
+        (word-status (:word @game-state) (:user-input @game-state)))))
+  (if (word-guessed?)
+    (println "You guessed right!")
+    (println "Sorry, you failed. The word was - " (:word @game-state))))
 
 (defn -main [& args]
-  (start-game)
   (run-game))
-

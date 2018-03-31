@@ -1,20 +1,20 @@
 # hangmangame
 
-FIXME: description
+The hangman game
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Run with lein
 
 ## Usage
 
 FIXME: explanation
 
-    $ java -jar hangmangame-0.1.0-standalone.jar [args]
+    $ java -jar hangmangame-0.1.0-standalone.jar
 
 ## Options
 
-FIXME: listing of options this app accepts.
+None
 
 ## Examples
 
