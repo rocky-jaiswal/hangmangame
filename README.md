@@ -8,25 +8,13 @@ Run with lein
 
 ## Usage
 
-FIXME: explanation
+    $ lein repl
+
+    or
+
+    $ lein uberjar
 
     $ java -jar hangmangame-0.1.0-standalone.jar
-
-## Options
-
-None
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
 
 ## License
 
